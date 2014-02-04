@@ -290,7 +290,7 @@ def process(dirName, nzbName=None, status=0, clientAgent = "manual", download_id
         try:
             urlObj = urllib.urlopen(url)
         except:
-            Logger.exception("Unable to open URL")
+            Logger.exception("Unable to open URL: %s", url)
             return 1 # failure
 
         result = json.load(urlObj)
