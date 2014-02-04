@@ -180,7 +180,7 @@ def processEpisode(dirName, nzbName=None, failed=False, inputCategory=None):
     try:
         urlObj = myOpener.openit(url)
     except:
-        Logger.exception("Unable to open URL")
+        Logger.exception("Unable to open URL: %s", url)
         return 1 # failure
 
     result = urlObj.readlines()
