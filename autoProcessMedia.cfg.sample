@@ -35,6 +35,8 @@ wait_for = 5
 watch_dir =
 fork = default
 delete_failed = 0
+nzbExtractionBy = Downloader
+Torrent_ForceLink = 1
 
 
 [HeadPhones]
@@ -77,14 +79,16 @@ web_root =
 
 
 [Torrent]
-###### clientAgent - Supported clients: utorrent, transmission, deluge, other
+###### clientAgent - Supported clients: utorrent, transmission, deluge, rtorrent, other
 clientAgent = other
 ###### useLink - Set to hard for physical links, sym for symbolic links, move to move, and no to not use links (copy)
 useLink = hard
 ###### outputDirectory - Default output directory (categories will be appended as sub directory to outputDirectory)
 outputDirectory = /abs/path/to/complete/
 ###### Other categories/labels defined for your downloader. Does not include CouchPotato, SickBeard, HeadPhones, Mylar categories.
-categories = music_videos,pictures,software,
+categories = music_videos,pictures,software,manual
+###### A list of categories that you don't want to be flattened (i.e preserve the directory structure when copying/linking.
+noFlatten = pictures,manual
 ###### uTorrent Hardlink solution (You must edit this if your using TorrentToMedia.py with uTorrent)
 uTorrentWEBui = http://localhost:8090/gui/
 uTorrentUSR = your username
@@ -148,9 +152,11 @@ user_script_mediaExtensions = .mkv,.avi,.divx,.xvid,.mov,.wmv,.mp4,.mpg,.mpeg
 #Specify the path of the script
 user_script_path = /media/test/script/script.sh
 #Specify the argument(s) passed to script, comma separated in order.
-#for example FP,FN,DN for file path (absolute file name with path), file name, absolute directory name (with path).
-#So the result is /media/test/script/script.sh FP FN DN. Add other arguments as needed eg -f, -r
+#for example FP,FN,DN, TN, TL for file path (absolute file name with path), file name, absolute directory name (with path), Torrent Name, Torrent Label/Category.
+#So the result is /media/test/script/script.sh FP FN DN TN TL. Add other arguments as needed eg -f, -r
 user_script_param = FN
+#Set user_script_runOnce = 0 to run for each file, or 1 to only run once (presumably on teh entire directory).
+user_script_runOnce = 0
 #Specify the successcodes returned by the user script as a comma separated list. Linux default is 0
 user_script_successCodes = 0
 #Clean after? Note that delay function is used to prevent possible mistake :) Delay is intended as seconds

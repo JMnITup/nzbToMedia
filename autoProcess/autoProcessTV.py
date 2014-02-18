@@ -41,7 +41,7 @@ def delete(dirName):
         Logger.exception("Unable to delete folder %s", dirName)
 
 
-def processEpisode(dirName, nzbName=None, failed=False, inputCategory=None):
+def processEpisode(dirName, nzbName=None, failed=False, clientAgent=None, inputCategory=None):
 
     status = int(failed)
     config = ConfigParser.ConfigParser()
@@ -104,12 +104,19 @@ def processEpisode(dirName, nzbName=None, failed=False, inputCategory=None):
         SampleIDs = (config.get("Extensions", "SampleIDs")).split(',')
     except (ConfigParser.NoOptionError, ValueError):
         SampleIDs = ['sample','-s.']
+    try:
+        nzbExtractionBy = config.get(section, "nzbExtractionBy")
+    except (ConfigParser.NoOptionError, ValueError):
+        nzbExtractionBy = "Downloader"
 
     TimeOut = 60 * int(wait_for) # SickBeard needs to complete all moving and renaming before returning the log sequence via url.
     socket.setdefaulttimeout(int(TimeOut)) #initialize socket timeout.
 
     mediaContainer = (config.get("Extensions", "mediaExtensions")).split(',')
     minSampleSize = int(config.get("Extensions", "minSampleSize"))
+
+    if not os.path.isdir(dirName) and os.path.isfile(dirName): # If the input directory is a file, assume single file download and split dir/name.
+        dirName = os.path.split(os.path.normpath(dirName))[0]
 
     SpecificPath = os.path.join(dirName, nzbName)
     cleanName = os.path.splitext(SpecificPath)
@@ -118,11 +125,16 @@ def processEpisode(dirName, nzbName=None, failed=False, inputCategory=None):
     if os.path.isdir(SpecificPath):
         dirName = SpecificPath
 
-    if not fork in SICKBEARD_TORRENT:
+    SICKBEARD_TORRENT_USE = SICKBEARD_TORRENT
+
+    if clientAgent in ['nzbget','sabnzbd'] and not nzbExtractionBy == "Destination": #Assume Torrent actions (unrar and link) don't happen. We need to check for valid media here.
+        SICKBEARD_TORRENT_USE = []
+
+    if not fork in SICKBEARD_TORRENT_USE:
         process_all_exceptions(nzbName.lower(), dirName)
         nzbName, dirName = converto_to_ascii(nzbName, dirName)
 
-    if nzbName != "Manual Run" and not fork in SICKBEARD_TORRENT:
+    if nzbName != "Manual Run" and not fork in SICKBEARD_TORRENT_USE:
         # Now check if movie files exist in destination:
         video = int(0)
         for dirpath, dirnames, filenames in os.walk(dirName):
